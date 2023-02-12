@@ -103,7 +103,6 @@ class Game:
 
     def print_game_info(self) -> None:
         os.system("cls" if os.name == "nt" else "clear")
-        print(self.game_field)
         for record in self.log:
             cprint(record["message"], record["color"])
         for row in self.game_field:
