@@ -1,10 +1,10 @@
 import config
-from game import Game
+from game import Game, GameStatus
 from player import Player
 
 
 def run():
-    game = Game()
+    game = Game(config.GAME_FIELD_SIZE)
     human_player = Player(is_human=True)
     while human_player.name is None:
         name = input("Введите ваше имя ")
@@ -17,11 +17,8 @@ def run():
     game.add_player(human_player)
     game.add_player(computer_player)
     game.change_step_order()
-    game.set_symbols()
-    game.set_colors()
-    while game.status == "in_process":
+    while game.status == GameStatus.IN_PROGRESS:
         game.step()
-
 
 
 if __name__ == "__main__":
