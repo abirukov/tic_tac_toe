@@ -8,9 +8,9 @@ from config import get_config
 
 def run():
     config = get_config()
-    game = Game(config["GAME_FIELD_SIZE"])
-    symbols_for_game = random.sample(config['PLAYER_SYMBOLS'], config['COUNT_PLAYERS'])
-    colors_for_game = random.sample(config['COLORS'], config['COUNT_PLAYERS'])
+    game = Game(int(config["GAME_FIELD_SIZE"]))
+    symbols_for_game = random.sample(config['PLAYER_SYMBOLS'], int(config['COUNT_PLAYERS']))
+    colors_for_game = random.sample(config['COLORS'], int(config['COUNT_PLAYERS']))
     human_player = Player(symbols_for_game[0], colors_for_game[0], is_human=True)
     while human_player.name is None:
         name = input("Введите ваше имя ")
