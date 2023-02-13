@@ -1,7 +1,7 @@
 *.log
-config.py
 .vscode/
 .idea/
 env/
 .DS-Store
 __pycache__/
+/.env

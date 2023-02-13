@@ -1,32 +1,29 @@
-import config
 import os
 import random
 
-from game_enums import GameStatus, Symbol, Color
+from game_enums import GameStatus
 from player import Player
 from termcolor import cprint
 
 
 class Game:
-    def __init__(self, field_size):
+    def __init__(self, field_size: int):
         self.game_field = [[None for _ in range(field_size)] for _ in range(field_size)]
         self.log = []
         self.players = []
         self.status = GameStatus.IN_PROGRESS
 
     def add_player(self, player: Player) -> None:
-        self.players.append(player)
-
-    def change_step_order(self) -> None:
-        random.shuffle(self.players)
+        self.players.insert(random.randint(0, len(self.players)), player)
 
     def step(self) -> None:
-        for player_index, player in enumerate(self.players):
-            if self.status == GameStatus.IN_PROGRESS:
-                player_step_coords = self.__get_step_coords(player)
-                self.__player_step_save(player_index, player_step_coords)
-                self.__check_game_status()
-                self.print_game_info()
+        for player in self.players:
+            if self.status != GameStatus.IN_PROGRESS:
+                return
+            player_step_coords = self.__get_step_coords(player)
+            self.__player_step_save(player, player_step_coords)
+            self.__check_game_status()
+            self.print_game_info()
 
     def __get_empty_cells(self) -> list[tuple | None]:
         empty_cells = []
@@ -36,7 +33,7 @@ class Game:
                     empty_cells.append((column_index, row_index))
         return empty_cells
 
-    def __check_game_status(self):
+    def __check_game_status(self) -> None:
         winner_symbol = None
         check_winner_results = [
             self.__column_fill_same_symbols(),
@@ -55,37 +52,36 @@ class Game:
             else:
                 self.log.append({"message": "Не нашли победителя, обратитесь к разработчику", "color": "magenta"})
             self.status = GameStatus.GAME_OVER
-        elif len(self.__get_empty_cells()) == 0:
+        elif not self.__get_empty_cells():
             self.log.append({"message": "Ничья", "color": "magenta"})
             self.status = GameStatus.GAME_OVER
 
-    def __player_step_save(self, player_index: int, step_coords: tuple) -> None:
-        symbol = list(Symbol)[player_index]
-        self.game_field[step_coords[1]][step_coords[0]] = symbol
+    def __player_step_save(self, player: Player, step_coords: tuple) -> None:
+        self.game_field[step_coords[1]][step_coords[0]] = player.symbol
         self.log.append(
             {
-                "message": f"{self.players[player_index].name} поставил {symbol.value} в {step_coords}",
-                "color": list(Color)[player_index].value
+                "message": f"{player.name} поставил {player.symbol} в {step_coords}",
+                "color": player.color.value
             }
         )
         cprint(self.log[-1]["message"], self.log[-1]["color"])
 
-    def __column_fill_same_symbols(self) -> None | Symbol:
+    def __column_fill_same_symbols(self) -> str | None:
         result = None
-        for column_index in range(config.GAME_FIELD_SIZE):
+        for column_index in range(len(self.game_field)):
             column = [row[column_index] for row in self.game_field]
             if column.count(column[0]) == len(column):
                 result = column[0]
         return result
 
-    def __row_fill_same_symbols(self) -> None | Symbol:
+    def __row_fill_same_symbols(self) -> str | None:
         result = None
         for row in self.game_field:
             if row.count(row[0]) == len(row):
                 result = row[0]
         return result
 
-    def __diagonal_fill_same_symbols(self) -> None | Symbol:
+    def __diagonal_fill_same_symbols(self) -> str | None:
         result = None
         left_diagonal = self.__get_diagonal_values()
         if left_diagonal.count(left_diagonal[0]) == len(left_diagonal):
@@ -95,9 +91,9 @@ class Game:
             result = right_diagonal[0]
         return result
 
-    def __get_player_by_symbol(self, symbol: Symbol) -> Player | None:
-        for player_index, player in enumerate(self.players):
-            if symbol == list(Symbol)[player_index]:
+    def __get_player_by_symbol(self, symbol: str) -> Player | None:
+        for player in self.players:
+            if symbol == player.symbol:
                 return player
         return None
 
@@ -106,7 +102,7 @@ class Game:
         for record in self.log:
             cprint(record["message"], record["color"])
         for row in self.game_field:
-            printable = "|".join([" " if x is None else x.value for x in row])
+            printable = "|".join([" " if cell_value is None else cell_value for cell_value in row])
             cprint(printable, "black", "on_white")
 
     def is_valid_coords(self, coord_x: int, coord_y: int) -> bool:
@@ -135,7 +131,7 @@ class Game:
 
         return coords
 
-    def __get_diagonal_values(self, reverse=False):
+    def __get_diagonal_values(self, reverse=False) -> list:
         diagonal_values = []
         for row_index, row in enumerate(self.game_field):
             if reverse:
