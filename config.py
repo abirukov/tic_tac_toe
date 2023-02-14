@@ -1,27 +1,31 @@
 import os
 import random
-from typing import Mapping, Any
+from collections import namedtuple
 
-from game_enums import Color
-import os
 from dotenv import load_dotenv
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-if os.path.exists(dotenv_path):
-    load_dotenv(dotenv_path)
+from game_enums import Color
 
 
-def get_config() -> Mapping[str, Any]:
-    config = {
-        "GAME_FIELD_SIZE": os.environ.get("GAME_FIELD_SIZE", 3),
-        "COUNT_PLAYERS": os.environ.get("COUNT_PLAYERS", 2),
-        "BOT_NAME": os.environ.get("BOT_NAME", "Бот"),
-        "PLAYER_SYMBOLS": os.environ.get("PLAYER_SYMBOLS", "X,O").split(",")
-    }
-    random.shuffle(config["PLAYER_SYMBOLS"])
+if os.path.exists(os.path.join(os.path.dirname(__file__), '.env')):
+    load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
+
+
+def get_config() -> namedtuple:
+    Config = namedtuple("Config", "game_field_size count_players bot_name player_symbols colors")
     color_values = os.environ.get("COLORS", "yellow,red").split(",")
-    color_enums = []
-    for color in list(Color):
-        if color_values.count(color.value):
-            color_enums.append(color)
-        config["COLORS"] = color_enums
-    return config
+    game_colors = []
+    for color in color_values:
+        try:
+            game_colors.append(Color(color))
+        except ValueError:
+            raise
+
+    game_symbols = os.environ.get("PLAYER_SYMBOLS", "X,O").split(",")
+    random.shuffle(game_symbols)
+    return Config(
+        game_field_size=os.environ.get("GAME_FIELD_SIZE", 3),
+        count_players=os.environ.get("COUNT_PLAYERS", 2),
+        bot_name=os.environ.get("BOT_NAME", "Бот"),
+        player_symbols=game_symbols,
+        colors=game_colors
+    )
