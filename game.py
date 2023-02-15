@@ -93,9 +93,9 @@ class Game:
                     coords = (coord_x, coord_y)
                     correct_input = True
                 elif not self.is_valid_coords(coord_x, coord_y):
-                    print('Координаты  ошибочны')
+                    self.log.append({"message": "Координаты  ошибочны", "color": "red"})
                 else:
-                    print('Клетка уже занята')
+                    self.log.append({"message": "Клетка уже занята", "color": "red"})
             except ValueError:
-                print("Ошибка ввода")
+                self.log.append({"message": "Ошибка ввода", "color": "red"})
         return coords

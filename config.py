@@ -1,17 +1,23 @@
 import os
 import random
-from collections import namedtuple
+from typing import NamedTuple
 
 from dotenv import load_dotenv
 from game_enums import Color
-
 
 if os.path.exists(os.path.join(os.path.dirname(__file__), '.env')):
     load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 
 
-def get_config() -> namedtuple:
-    Config = namedtuple("Config", "game_field_size count_players bot_name player_symbols colors")
+class Config(NamedTuple):
+    game_field_size: int
+    count_players: int
+    bot_name: str
+    player_symbols: list[str]
+    colors: list[Color]
+
+
+def get_config() -> Config:
     color_values = os.environ.get("COLORS", "yellow,red").split(",")
     game_colors = []
     for color in color_values:
@@ -19,7 +25,6 @@ def get_config() -> namedtuple:
             game_colors.append(Color(color))
         except ValueError:
             raise
-
     game_symbols = os.environ.get("PLAYER_SYMBOLS", "X,O").split(",")
     random.shuffle(game_symbols)
     return Config(

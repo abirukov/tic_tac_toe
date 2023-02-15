@@ -1,12 +1,19 @@
+from dataclasses import dataclass
+
 from game_enums import Color
 
 
+@dataclass
 class Player:
-    def __init__(self, symbol: str, color: Color, is_human=False):
-        self.name = None
-        self.is_human = is_human
-        self.symbol = symbol
-        self.color = color
+    symbol: str
+    color: Color
+    is_human: bool = False
+    name: str | None = None
 
-    def __repr__(self) -> str:
-        return f"Player name: {self.name}, is_human: {self.is_human}, symbol: {self.symbol}, color: {self.color}"
+    def input_name(self):
+        while self.name is None:
+            name = input("Введите ваше имя ")
+            if len(name) > 0:
+                self.name = name
+            else:
+                print("Имя не может быть пустым")
