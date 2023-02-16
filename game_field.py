@@ -44,3 +44,6 @@ class GameField:
                 needle_column_position = row_index
             diagonal_values.append(self.values[row_index][needle_column_position])
         return diagonal_values
+
+    def is_valid_coords(self, coord_x: int, coord_y: int) -> bool:
+        return 0 <= coord_x < len(self.values[0]) and 0 <= coord_y < len(self.values)

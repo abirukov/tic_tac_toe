@@ -8,14 +8,12 @@ from termcolor import cprint
 
 
 class Game:
-    def __init__(self, field_size: int):
+    def __init__(self, field_size: int, players: list[Player]):
         self.game_field = GameField(field_size)
         self.log = []
-        self.players = []
+        self.players = players
         self.status = GameStatus.IN_PROGRESS
-
-    def add_player(self, player: Player) -> None:
-        self.players.insert(random.randint(0, len(self.players)), player)
+        random.shuffle(self.players)
 
     def step(self) -> None:
         for player in self.players:
@@ -54,16 +52,15 @@ class Game:
         self.log.append(
             {
                 "message": f"{player.name} поставил {player.symbol} в {step_coords}",
-                "color": player.color.value
+                "color": player.color.value,
             }
         )
         cprint(self.log[-1]["message"], self.log[-1]["color"])
 
-    def __get_player_by_symbol(self, symbol: str) -> Player | None:
+    def __get_player_by_symbol(self, symbol: str) -> Player:
         for player in self.players:
             if symbol == player.symbol:
                 return player
-        return None
 
     def print_game_info(self) -> None:
         os.system("cls" if os.name == "nt" else "clear")
@@ -72,9 +69,6 @@ class Game:
         for row in self.game_field.values:
             printable = "|".join([" " if cell_value is None else cell_value for cell_value in row])
             cprint(printable, "black", "on_white")
-
-    def is_valid_coords(self, coord_x: int, coord_y: int) -> bool:
-        return 0 <= coord_x < len(self.game_field.values[0]) and 0 <= coord_y < len(self.game_field.values)
 
     def __get_step_coords(self, player: Player) -> tuple:
         empty_cells = self.game_field.get_empty_cells()
@@ -92,7 +86,7 @@ class Game:
                 if empty_cells.count((coord_x, coord_y)):
                     coords = (coord_x, coord_y)
                     correct_input = True
-                elif not self.is_valid_coords(coord_x, coord_y):
+                elif not self.game_field.is_valid_coords(coord_x, coord_y):
                     self.log.append({"message": "Координаты  ошибочны", "color": "red"})
                 else:
                     self.log.append({"message": "Клетка уже занята", "color": "red"})

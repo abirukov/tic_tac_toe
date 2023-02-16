@@ -21,10 +21,7 @@ def get_config() -> Config:
     color_values = os.environ.get("COLORS", "yellow,red").split(",")
     game_colors = []
     for color in color_values:
-        try:
-            game_colors.append(Color(color))
-        except ValueError:
-            raise
+        game_colors.append(Color(color))
     game_symbols = os.environ.get("PLAYER_SYMBOLS", "X,O").split(",")
     random.shuffle(game_symbols)
     return Config(
@@ -32,5 +29,5 @@ def get_config() -> Config:
         count_players=os.environ.get("COUNT_PLAYERS", 2),
         bot_name=os.environ.get("BOT_NAME", "Бот"),
         player_symbols=game_symbols,
-        colors=game_colors
+        colors=game_colors,
     )
