@@ -47,3 +47,14 @@ class GameField:
 
     def is_valid_coords(self, coord_x: int, coord_y: int) -> bool:
         return 0 <= coord_x < len(self.values[0]) and 0 <= coord_y < len(self.values)
+
+    def get_winner_symbol_if_game_over(self) -> str | None:
+        check_winner_results = [
+            self.column_fill_same_symbols(),
+            self.row_fill_same_symbols(),
+            self.diagonal_fill_same_symbols(),
+        ]
+        for result in check_winner_results:
+            if result is not None:
+                return result
+        return None

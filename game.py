@@ -25,17 +25,7 @@ class Game:
             self.print_game_info()
 
     def __check_game_status(self) -> None:
-        winner_symbol = None
-        check_winner_results = [
-            self.game_field.column_fill_same_symbols(),
-            self.game_field.row_fill_same_symbols(),
-            self.game_field.diagonal_fill_same_symbols(),
-        ]
-        for result in check_winner_results:
-            if result is not None:
-                winner_symbol = result
-                break
-
+        winner_symbol = self.game_field.get_winner_symbol_if_game_over()
         if winner_symbol is not None:
             winner = self.__get_player_by_symbol(winner_symbol)
             if winner is not None:
@@ -92,4 +82,5 @@ class Game:
                     self.log.append({"message": "Клетка уже занята", "color": "red"})
             except ValueError:
                 self.log.append({"message": "Ошибка ввода", "color": "red"})
+            self.print_game_info()
         return coords
